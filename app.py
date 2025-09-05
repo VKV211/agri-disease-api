@@ -1,104 +1,78 @@
-import uvicorn
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
-import numpy as np
 import json
-from io import BytesIO
-from PIL import Image
-import logging
-import re
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
+# Initialize app
 app = FastAPI()
 
-# Configure CORS
+# Allow CORS (React Native / Web)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # you can restrict later
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Load model and labels
+# Load model and class indices
+MODEL_PATH = "plant_disease_model.h5"
+CLASS_INDICES_PATH = "class_indices.json"
+
 try:
-    MODEL_PATH = "plant_disease_model.h5"
-    CLASS_INDICES_PATH = "class_indices.json"
-    
     model = load_model(MODEL_PATH)
-    logger.info("✅ Model loaded successfully")
-    
+except Exception as e:
+    raise RuntimeError(f"❌ Error loading model: {str(e)}")
+
+try:
     with open(CLASS_INDICES_PATH, "r") as f:
         class_indices = json.load(f)
-    
-    class_labels = {v: k for k, v in class_indices.items()}
-    logger.info(f"✅ Class labels loaded: {len(class_labels)} classes")
+    # Reverse mapping {index: class_name}
+    idx_to_class = {v: k for k, v in class_indices.items()}
 except Exception as e:
-    logger.error(f"❌ Error loading model or class indices: {str(e)}")
-    raise e
+    raise RuntimeError(f"❌ Error loading class indices: {str(e)}")
 
-def predict_image(img: Image.Image):
-    """Preprocess image and make prediction"""
-    try:
-        img = img.resize((224, 224))
-        img_array = image.img_to_array(img)
-        img_array = np.expand_dims(img_array, axis=0) / 255.0
-        
-        predictions = model.predict(img_array)
-        predicted_class_idx = int(np.argmax(predictions[0]))
-        confidence = float(np.max(predictions[0]))
-        
-        return class_labels[predicted_class_idx], confidence
-    except Exception as e:
-        logger.error(f"❌ Error during prediction: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
 @app.get("/")
-async def home():
-    return {"message": "🌱 Plant Disease Detection API is running!"}
+def home():
+    return {"message": "✅ Plant Disease Prediction API is running!"}
 
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy", "model_loaded": True}
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     try:
-        if not file.content_type.startswith('image/'):
-            raise HTTPException(status_code=400, detail="File must be an image")
-        
-        contents = await file.read()
-        
-        if isinstance(contents, str):
-            logger.warning("Received string content, attempting to extract image data")
-            if "base64" in contents:
-                base64_data = re.search(r"base64,(.*)", contents)
-                if base64_data:
-                    import base64
-                    contents = base64.b64decode(base64_data.group(1))
-                else:
-                    raise HTTPException(status_code=422, detail="Invalid image format")
-        
-        img = Image.open(BytesIO(contents)).convert("RGB")
-        
-        label, confidence = predict_image(img)
-        
-        return {
-            "prediction": label,
-            "confidence": round(confidence * 100, 2),
-            "status": "success"
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"❌ Unexpected error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+        # Ensure it's an image
+        if not file.content_type.startswith("image/"):
+            raise HTTPException(status_code=400, detail="File is not an image")
 
-# ✅ Local testing only
+        # Read image
+        contents = await file.read()
+        with open("temp.jpg", "wb") as f:
+            f.write(contents)
+
+        img = image.load_img("temp.jpg", target_size=(224, 224))
+        img_array = image.img_to_array(img)
+        img_array = np.expand_dims(img_array, axis=0) / 255.0
+
+        # Prediction
+        predictions = model.predict(img_array)
+        predicted_class = np.argmax(predictions, axis=1)[0]
+        confidence = round(float(np.max(predictions)) * 100, 2)
+
+        disease_name = idx_to_class.get(predicted_class, "Unknown")
+
+        return {
+            "status": "success",
+            "prediction": disease_name,
+            "confidence": confidence
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app:app", host="0.0.0.0", port=8000)
