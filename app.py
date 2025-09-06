@@ -7,7 +7,6 @@ from tensorflow.keras.preprocessing import image
 import json
 import io
 from PIL import Image
-import google.generativeai as genai
 
 # -------------------------
 # Initialize FastAPI app
@@ -35,6 +34,7 @@ app.add_middleware(
 # -------------------------
 MODEL_PATH = "plant_disease_model.h5"
 CLASS_INDICES_PATH = "class_indices.json"
+DISEASE_SUGGESTIONS_PATH = "disease_suggestions.json"
 
 try:
     model = load_model(MODEL_PATH)
@@ -51,36 +51,26 @@ try:
 except Exception as e:
     raise RuntimeError(f"❌ Error loading class indices: {str(e)}")
 
+try:
+    with open(DISEASE_SUGGESTIONS_PATH, "r") as f:
+        disease_suggestions = json.load(f)
+    print("✅ Disease suggestions loaded successfully")
+except Exception as e:
+    raise RuntimeError(f"❌ Error loading disease suggestions: {str(e)}")
 
 # -------------------------
-# Gemini Setup
+# Helper function
 # -------------------------
-GEMINI_API_KEY = "YOUR_GEMINI_API_KEY"  # 🔑 Replace with your key
-genai.configure(api_key=GEMINI_API_KEY)
-gemini_model = genai.GenerativeModel("gemini-1.5-flash")
-
-def get_disease_suggestion(disease_name: str) -> str:
-    """Fetch farmer-friendly suggestions from Gemini."""
-    try:
-        prompt = f"""
-        The detected plant disease is: {disease_name}.
-        Please give short, clear, farmer-friendly treatment steps,
-        including natural remedies and preventive measures.
-        Limit to 5 bullet points.
-        """
-        response = gemini_model.generate_content(prompt)
-        return response.text.strip()
-    except Exception as e:
-        return f"⚠️ Could not fetch AI suggestion: {str(e)}"
-
+def get_disease_suggestion(disease_name: str):
+    """Fetch farmer-friendly suggestions from static JSON."""
+    return disease_suggestions.get(disease_name, ["No suggestion available for this disease"])
 
 # -------------------------
 # Routes
 # -------------------------
 @app.get("/")
 def home():
-    return {"message": "🌱 Plant Disease Prediction API with Gemini is running!"}
-
+    return {"message": "🌱 Plant Disease Prediction API is running!"}
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
@@ -105,7 +95,7 @@ async def predict(file: UploadFile = File(...)):
 
         disease_name = idx_to_class.get(predicted_index, "Unknown")
 
-        # ✅ Get AI suggestions from Gemini
+        # ✅ Get suggestions from static JSON
         suggestion = get_disease_suggestion(disease_name)
 
         return {
@@ -117,7 +107,6 @@ async def predict(file: UploadFile = File(...)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # -------------------------
 # Run locally
