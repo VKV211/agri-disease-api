@@ -5,13 +5,21 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import json
+
 # Initialize app
 app = FastAPI()
 
-# Allow CORS (React Native / Web)
+# ✅ CORS setup
+origins = [
+    "*",  # allow all origins (can restrict later)
+    "http://localhost:8081",  # Expo web (React Native dev)
+    "http://localhost:3000",  # React web app
+    "https://agri-disease-api.onrender.com",  # Deployed backend
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # you can restrict later
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
