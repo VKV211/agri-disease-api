@@ -1,0 +1,268 @@
+{
+  "Apple___Apple_scab": [
+    "Remove and destroy infected leaves and fruits",
+    "Apply fungicide sprays during wet seasons",
+    "Ensure proper pruning for air circulation",
+    "Avoid overhead watering",
+    "Plant resistant apple varieties"
+  ],
+  "Apple___Black_rot": [
+    "Prune out infected branches and fruits",
+    "Remove fallen leaves and debris from orchard",
+    "Apply recommended fungicides regularly",
+    "Avoid injuries to tree bark",
+    "Ensure proper spacing for air circulation"
+  ],
+  "Apple___Cedar_apple_rust": [
+    "Remove nearby cedar trees if possible",
+    "Apply fungicide sprays during spring",
+    "Pick and destroy infected leaves",
+    "Ensure good airflow around trees",
+    "Plant resistant apple varieties"
+  ],
+  "Apple___healthy": [
+    "Maintain proper irrigation and fertilization",
+    "Regularly inspect trees for signs of disease",
+    "Prune dead or crowded branches",
+    "Keep orchard floor clean from debris",
+    "Monitor for pests regularly"
+  ],
+  "Blueberry___healthy": [
+    "Water regularly, keeping soil moist but not waterlogged",
+    "Prune annually to maintain shape and airflow",
+    "Mulch to conserve soil moisture",
+    "Monitor for pests and diseases",
+    "Apply fertilizer as recommended for blueberries"
+  ],
+  "Cherry_(including_sour)___Powdery_mildew": [
+    "Remove and destroy infected leaves and shoots",
+    "Apply fungicide sprays early in season",
+    "Prune to increase sunlight and airflow",
+    "Avoid overhead irrigation",
+    "Monitor and control aphid infestations"
+  ],
+  "Cherry_(including_sour)___healthy": [
+    "Water adequately, avoiding waterlogging",
+    "Prune to allow sunlight penetration",
+    "Monitor regularly for pests and diseases",
+    "Apply balanced fertilization",
+    "Remove fallen leaves and debris"
+  ],
+  "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": [
+    "Remove infected leaves",
+    "Rotate crops to prevent disease buildup",
+    "Apply fungicides as recommended",
+    "Ensure proper spacing between plants",
+    "Avoid overhead watering"
+  ],
+  "Corn_(maize)___Common_rust_": [
+    "Plant resistant maize varieties",
+    "Remove and destroy infected plant debris",
+    "Apply fungicides if necessary",
+    "Maintain proper plant spacing",
+    "Monitor fields regularly for early signs"
+  ],
+  "Corn_(maize)___Northern_Leaf_Blight": [
+    "Remove infected leaves",
+    "Use disease-free seeds",
+    "Apply fungicides early in season",
+    "Rotate crops with non-host plants",
+    "Ensure proper irrigation and drainage"
+  ],
+  "Corn_(maize)___healthy": [
+    "Plant certified seeds and maintain spacing",
+    "Monitor for pests and diseases",
+    "Ensure adequate fertilization",
+    "Rotate crops to prevent disease buildup",
+    "Maintain proper irrigation practices"
+  ],
+  "Grape___Black_rot": [
+    "Remove and destroy infected leaves and clusters",
+    "Apply fungicides during wet seasons",
+    "Prune to improve air circulation",
+    "Remove fallen debris from vineyard",
+    "Plant resistant grape varieties"
+  ],
+  "Grape___Esca_(Black_Measles)": [
+    "Prune infected wood and remove diseased plants",
+    "Avoid wounding vines during maintenance",
+    "Apply fungicides if recommended",
+    "Ensure proper drainage and sunlight",
+    "Monitor regularly for early symptoms"
+  ],
+  "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)": [
+    "Remove infected leaves",
+    "Apply fungicides regularly",
+    "Maintain good spacing for airflow",
+    "Remove debris from vineyard floor",
+    "Monitor for pest infestations"
+  ],
+  "Grape___healthy": [
+    "Maintain proper irrigation and fertilization",
+    "Prune for airflow and sunlight",
+    "Inspect for pests and diseases regularly",
+    "Remove fallen leaves and debris",
+    "Plant resistant grape varieties if possible"
+  ],
+  "Orange___Haunglongbing_(Citrus_greening)": [
+    "Remove and destroy infected trees",
+    "Control psyllid insect vectors",
+    "Use certified disease-free saplings",
+    "Prune and manage orchards for airflow",
+    "Monitor regularly and apply recommended treatments"
+  ],
+  "Peach___Bacterial_spot": [
+    "Remove infected leaves and fruits",
+    "Apply copper-based sprays during growing season",
+    "Prune to increase airflow",
+    "Avoid overhead irrigation",
+    "Plant resistant peach varieties if available"
+  ],
+  "Peach___healthy": [
+    "Maintain proper irrigation and fertilization",
+    "Prune to allow sunlight penetration",
+    "Monitor for pests and diseases",
+    "Keep orchard floor clean",
+    "Apply preventive sprays if recommended"
+  ],
+  "Pepper,_bell___Bacterial_spot": [
+    "Remove infected leaves and fruits",
+    "Use copper-based sprays",
+    "Avoid overhead watering",
+    "Practice crop rotation",
+    "Plant disease-resistant varieties"
+  ],
+  "Pepper,_bell___healthy": [
+    "Water plants at the base, avoiding wetting leaves",
+    "Use proper fertilization",
+    "Inspect plants regularly for pests or disease",
+    "Prune overcrowded leaves",
+    "Rotate crops annually"
+  ],
+  "Potato___Early_blight": [
+    "Remove infected leaves",
+    "Apply fungicides regularly",
+    "Ensure proper spacing and airflow",
+    "Rotate crops with non-host plants",
+    "Avoid overhead irrigation"
+  ],
+  "Potato___Late_blight": [
+    "Remove and destroy infected plants",
+    "Apply fungicides early",
+    "Ensure proper drainage",
+    "Plant certified disease-free seed potatoes",
+    "Rotate crops annually"
+  ],
+  "Potato___healthy": [
+    "Plant certified seeds and rotate crops",
+    "Monitor regularly for disease symptoms",
+    "Maintain proper spacing",
+    "Water at soil level to avoid leaf wetting",
+    "Apply balanced fertilization"
+  ],
+  "Raspberry___healthy": [
+    "Prune canes to improve airflow",
+    "Monitor for pests and diseases",
+    "Mulch to conserve soil moisture",
+    "Apply fertilizers as recommended",
+    "Remove debris from the field"
+  ],
+  "Soybean___healthy": [
+    "Use certified seeds and rotate crops",
+    "Monitor regularly for pests and disease",
+    "Maintain proper irrigation",
+    "Apply balanced fertilizers",
+    "Keep field clean and remove debris"
+  ],
+  "Squash___Powdery_mildew": [
+    "Remove infected leaves",
+    "Apply fungicide sprays",
+    "Ensure proper spacing and airflow",
+    "Avoid wetting leaves during irrigation",
+    "Plant resistant squash varieties"
+  ],
+  "Strawberry___Leaf_scorch": [
+    "Remove and destroy infected leaves",
+    "Avoid overhead watering",
+    "Apply recommended fungicides",
+    "Maintain proper spacing for airflow",
+    "Rotate crops to prevent disease buildup"
+  ],
+  "Strawberry___healthy": [
+    "Ensure adequate irrigation and fertilization",
+    "Prune old leaves and runners",
+    "Monitor for pests and disease",
+    "Maintain proper spacing for airflow",
+    "Remove debris from field"
+  ],
+  "Tomato___Bacterial_spot": [
+    "Remove infected leaves",
+    "Apply copper-based sprays",
+    "Avoid overhead watering",
+    "Rotate crops to prevent recurrence",
+    "Plant resistant tomato varieties"
+  ],
+  "Tomato___Early_blight": [
+    "Remove infected leaves",
+    "Apply fungicides early",
+    "Ensure proper spacing for airflow",
+    "Rotate crops with non-host plants",
+    "Avoid wetting leaves during irrigation"
+  ],
+  "Tomato___Late_blight": [
+    "Remove infected plants immediately",
+    "Apply fungicides preventively",
+    "Ensure proper drainage",
+    "Plant certified disease-free seedlings",
+    "Rotate crops annually"
+  ],
+  "Tomato___Leaf_Mold": [
+    "Remove infected leaves",
+    "Apply fungicide sprays",
+    "Ensure good airflow around plants",
+    "Avoid wetting leaves",
+    "Plant resistant varieties if possible"
+  ],
+  "Tomato___Septoria_leaf_spot": [
+    "Remove infected leaves and debris",
+    "Apply fungicides regularly",
+    "Water at soil level only",
+    "Ensure proper spacing and airflow",
+    "Rotate crops to prevent recurrence"
+  ],
+  "Tomato___Spider_mites Two-spotted_spider_mite": [
+    "Spray with insecticidal soap or neem oil",
+    "Maintain proper irrigation to reduce stress",
+    "Remove heavily infested leaves",
+    "Encourage natural predators like ladybugs",
+    "Monitor plants regularly"
+  ],
+  "Tomato___Target_Spot": [
+    "Remove infected leaves",
+    "Apply fungicide sprays",
+    "Ensure proper spacing and airflow",
+    "Avoid overhead irrigation",
+    "Rotate crops with non-host plants"
+  ],
+  "Tomato___Tomato_Yellow_Leaf_Curl_Virus": [
+    "Remove infected plants immediately",
+    "Control whitefly vectors using insecticides",
+    "Plant resistant tomato varieties",
+    "Maintain proper field hygiene",
+    "Rotate crops annually"
+  ],
+  "Tomato___Tomato_mosaic_virus": [
+    "Remove infected plants",
+    "Avoid handling healthy plants after infected ones",
+    "Use virus-free seeds and seedlings",
+    "Control insect vectors like aphids",
+    "Disinfect tools and hands frequently"
+  ],
+  "Tomato___healthy": [
+    "Water plants at soil level",
+    "Ensure proper fertilization and pruning",
+    "Monitor regularly for pests and disease",
+    "Maintain proper spacing for airflow",
+    "Remove plant debris from field"
+  ]
+}
