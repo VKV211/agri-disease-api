@@ -7,6 +7,7 @@ from tensorflow.keras.preprocessing import image
 import json
 import io
 from PIL import Image
+import google.generativeai as genai
 
 # -------------------------
 # Initialize FastAPI app
@@ -52,11 +53,33 @@ except Exception as e:
 
 
 # -------------------------
+# Gemini Setup
+# -------------------------
+GEMINI_API_KEY = "YOUR_GEMINI_API_KEY"  # 🔑 Replace with your key
+genai.configure(api_key=GEMINI_API_KEY)
+gemini_model = genai.GenerativeModel("gemini-1.5-flash")
+
+def get_disease_suggestion(disease_name: str) -> str:
+    """Fetch farmer-friendly suggestions from Gemini."""
+    try:
+        prompt = f"""
+        The detected plant disease is: {disease_name}.
+        Please give short, clear, farmer-friendly treatment steps,
+        including natural remedies and preventive measures.
+        Limit to 5 bullet points.
+        """
+        response = gemini_model.generate_content(prompt)
+        return response.text.strip()
+    except Exception as e:
+        return f"⚠️ Could not fetch AI suggestion: {str(e)}"
+
+
+# -------------------------
 # Routes
 # -------------------------
 @app.get("/")
 def home():
-    return {"message": "🌱 Plant Disease Prediction API is running!"}
+    return {"message": "🌱 Plant Disease Prediction API with Gemini is running!"}
 
 
 @app.post("/predict")
@@ -66,7 +89,7 @@ async def predict(file: UploadFile = File(...)):
         if not file.content_type or not file.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail="File is not an image")
 
-        # Read file as PIL image (no temp file needed)
+        # Read file as PIL image
         contents = await file.read()
         img = Image.open(io.BytesIO(contents)).convert("RGB")
 
@@ -82,10 +105,14 @@ async def predict(file: UploadFile = File(...)):
 
         disease_name = idx_to_class.get(predicted_index, "Unknown")
 
+        # ✅ Get AI suggestions from Gemini
+        suggestion = get_disease_suggestion(disease_name)
+
         return {
             "status": "success",
             "prediction": disease_name,
-            "confidence": confidence
+            "confidence": confidence,
+            "suggestion": suggestion
         }
 
     except Exception as e:
