@@ -8,7 +8,6 @@ from PIL import Image
 import io
 import json
 import requests
-import os
 
 # -------------------------
 # Initialize FastAPI app
@@ -51,24 +50,29 @@ except Exception as e:
     raise RuntimeError(f"Failed to load class indices: {e}")
 
 # -------------------------
-# Gemini API Setup
+# API Keys
 # -------------------------
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyBVBgBaKHy1CoxbIzisjGDAQB_z82wjnB4")
+GEMINI_API_KEY = "AIzaSyAc_g9Oek-wavaFWDeyncuD-PywXS-GI90"
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
-# -------------------------
-# Weather API Setup
-# -------------------------
-WEATHER_API_KEY = os.getenv("WEATHER_API_KEY", "AIzaSyBVBgBaKHy1CoxbIzisjGDAQB_z82wjnB4")
+WEATHER_API_KEY = "e616641ff2bafc2ab87c58aad11d3f6e"
+WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather"
 
+# -------------------------
+# Weather API
+# -------------------------
 def get_weather(location: str):
     """Fetch weather information for a given location."""
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={WEATHER_API_KEY}&units=metric"
+    params = {
+        "q": f"{location},IN",
+        "appid": WEATHER_API_KEY,
+        "units": "metric"
+    }
     try:
-        response = requests.get(url)
+        response = requests.get(WEATHER_URL, params=params)
         response.raise_for_status()
         return response.json()
-    except:
+    except Exception:
         return None
 
 # -------------------------
@@ -82,14 +86,26 @@ def fetch_gemini_suggestion(disease_name: str, weather_info: dict = None):
             temp = weather_info.get('main', {}).get('temp')
             humidity = weather_info.get('main', {}).get('humidity')
             rain = weather_info.get('rain', {}).get('1h', 0)
-            weather_text = f"Current temperature: {temp}°C, Humidity: {humidity}%, Rainfall: {rain}mm."
-        prompt = f"The crop leaf is healthy. {weather_text} Give 3 simple precautionary steps farmers should take based on season and weather."
+            weather_text = f" Current temperature: {temp}°C, Humidity: {humidity}%, Rainfall: {rain}mm."
+        prompt = f"The crop leaf is healthy.{weather_text} Give 3 simple precautionary steps farmers should take based on season and weather."
     else:
         prompt = f"The crop is affected by {disease_name}. Give 3 simple farmer-friendly treatment suggestions, including general care and medication names if possible."
 
-    body = {"contents": [{"parts": [{"text": prompt}]}]}
+    body = {
+        "contents": [
+            {
+                "role": "user",
+                "parts": [{"text": prompt}]
+            }
+        ]
+    }
+
     try:
-        response = requests.post(GEMINI_URL, json=body, headers={"Content-Type": "application/json"})
+        response = requests.post(
+            GEMINI_URL,
+            json=body,
+            headers={"Content-Type": "application/json"}
+        )
         response.raise_for_status()
         data = response.json()
         suggestion = data.get("candidates", [])[0]["content"]["parts"][0]["text"].strip()
