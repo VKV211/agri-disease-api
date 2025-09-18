@@ -15,8 +15,13 @@ import os
 # -------------------------
 app = FastAPI(title="🌱 Plant Disease Prediction API")
 
-# ✅ CORS setup
-origins = ["*"]
+# ✅ CORS setup with multiple origins
+origins = [
+    "*",  # allow all origins (dev/testing)
+    "http://localhost:8081",  # Expo web
+    "http://localhost:3000",  # React web
+    "https://agri-disease-api.onrender.com",  # Deployed backend
+]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -89,7 +94,11 @@ def home():
     return {"message": "🌱 Plant Disease Prediction API is running!"}
 
 @app.post("/predict")
-async def predict(file: UploadFile = File(...), location: str = Form("Bengaluru")):
+async def predict(file: UploadFile = File(...), location: str = Form(...)):
+    """
+    Predict plant disease from uploaded image.
+    Optional: pass 'location' for weather-based suggestions if leaf is healthy.
+    """
     try:
         if not file.content_type or not file.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail="File is not an image")
@@ -120,7 +129,7 @@ async def predict(file: UploadFile = File(...), location: str = Form("Bengaluru"
 
         # Weather info (for healthy leaves)
         weather_info = None
-        if disease_name.lower() == "healthy":
+        if disease_name.lower() == "healthy" and location:
             weather_info = get_weather(location)
 
         # Get Gemini suggestion
