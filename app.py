@@ -53,13 +53,13 @@ except Exception as e:
 # -------------------------
 # Gemini API Setup
 # -------------------------
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_GEMINI_API_KEY_HERE")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyBVBgBaKHy1CoxbIzisjGDAQB_z82wjnB4")
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
 # -------------------------
 # Weather API Setup
 # -------------------------
-WEATHER_API_KEY = os.getenv("WEATHER_API_KEY", "YOUR_WEATHER_API_KEY_HERE")
+WEATHER_API_KEY = os.getenv("WEATHER_API_KEY", "AIzaSyBVBgBaKHy1CoxbIzisjGDAQB_z82wjnB4")
 
 def get_weather(location: str):
     """Fetch weather information for a given location."""
