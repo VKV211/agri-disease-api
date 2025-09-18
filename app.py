@@ -15,12 +15,14 @@ import os
 # -------------------------
 app = FastAPI(title="🌱 Plant Disease Prediction API")
 
-# ✅ CORS setup with multiple origins
+# -------------------------
+# CORS configuration
+# -------------------------
 origins = [
-    "*",  # allow all origins (dev/testing)
-    "http://localhost:8081",  # Expo web
-    "http://localhost:3000",  # React web
-    "https://agri-disease-api.onrender.com",  # Deployed backend
+    "*",  # allow all origins (for dev/testing)
+    "http://localhost:8081",
+    "http://localhost:3000",
+    "https://agri-disease-api.onrender.com",
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -36,23 +38,31 @@ app.add_middleware(
 MODEL_PATH = "plant_disease_model.h5"
 CLASS_INDICES_PATH = "class_indices.json"
 
-model = load_model(MODEL_PATH)
-with open(CLASS_INDICES_PATH, "r") as f:
-    class_indices = json.load(f)
-idx_to_class = {v: k for k, v in class_indices.items()}
+try:
+    model = load_model(MODEL_PATH)
+except Exception as e:
+    raise RuntimeError(f"Failed to load model: {e}")
+
+try:
+    with open(CLASS_INDICES_PATH, "r") as f:
+        class_indices = json.load(f)
+    idx_to_class = {v: k for k, v in class_indices.items()}
+except Exception as e:
+    raise RuntimeError(f"Failed to load class indices: {e}")
 
 # -------------------------
 # Gemini API Setup
 # -------------------------
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyBVBgBaKHy1CoxbIzisjGDAQB_z82wjnB4")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_GEMINI_API_KEY_HERE")
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
 # -------------------------
 # Weather API Setup
 # -------------------------
-WEATHER_API_KEY = "AIzaSyBVBgBaKHy1CoxbIzisjGDAQB_z82wjnB4"  # Replace with your key
+WEATHER_API_KEY = os.getenv("WEATHER_API_KEY", "YOUR_WEATHER_API_KEY_HERE")
 
 def get_weather(location: str):
+    """Fetch weather information for a given location."""
     url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={WEATHER_API_KEY}&units=metric"
     try:
         response = requests.get(url)
@@ -65,11 +75,12 @@ def get_weather(location: str):
 # Gemini API Suggestion
 # -------------------------
 def fetch_gemini_suggestion(disease_name: str, weather_info: dict = None):
+    """Fetch farmer-friendly suggestions from Gemini LLM."""
     if disease_name.lower() == "healthy":
         weather_text = ""
         if weather_info:
-            temp = weather_info['main']['temp']
-            humidity = weather_info['main']['humidity']
+            temp = weather_info.get('main', {}).get('temp')
+            humidity = weather_info.get('main', {}).get('humidity')
             rain = weather_info.get('rain', {}).get('1h', 0)
             weather_text = f"Current temperature: {temp}°C, Humidity: {humidity}%, Rainfall: {rain}mm."
         prompt = f"The crop leaf is healthy. {weather_text} Give 3 simple precautionary steps farmers should take based on season and weather."
@@ -94,20 +105,20 @@ def home():
     return {"message": "🌱 Plant Disease Prediction API is running!"}
 
 @app.post("/predict")
-async def predict(file: UploadFile = File(...), location: str = Form(...)):
+async def predict(file: UploadFile = File(...), location: str = Form(default=None)):
     """
     Predict plant disease from uploaded image.
-    Optional: pass 'location' for weather-based suggestions if leaf is healthy.
+    - file: leaf image
+    - location: optional, used for weather-based suggestions if leaf is healthy
     """
     try:
+        # Validate image
         if not file.content_type or not file.content_type.startswith("image/"):
-            raise HTTPException(status_code=400, detail="File is not an image")
+            raise HTTPException(status_code=400, detail="Uploaded file is not an image")
 
-        # Load image
+        # Load and preprocess image
         contents = await file.read()
         img = Image.open(io.BytesIO(contents)).convert("RGB")
-
-        # Preprocess
         img = img.resize((224, 224))
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0) / 255.0
@@ -118,7 +129,7 @@ async def predict(file: UploadFile = File(...), location: str = Form(...)):
         confidence = round(float(np.max(predictions)) * 100, 2)
         disease_name = idx_to_class.get(predicted_index, "Unknown")
 
-        # Confidence threshold
+        # Low confidence handling
         if confidence < 70:
             return {
                 "status": "low_confidence",
@@ -127,12 +138,12 @@ async def predict(file: UploadFile = File(...), location: str = Form(...)):
                 "suggestion": "AI is not confident about this prediction. Please retake the photo or consult an expert."
             }
 
-        # Weather info (for healthy leaves)
+        # Weather info for healthy leaves
         weather_info = None
         if disease_name.lower() == "healthy" and location:
             weather_info = get_weather(location)
 
-        # Get Gemini suggestion
+        # Get suggestions from Gemini
         suggestion = fetch_gemini_suggestion(disease_name, weather_info)
 
         return {
