@@ -62,13 +62,23 @@ WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather"
 # Weather API
 # -------------------------
 def get_weather(location: str):
-    """Fetch weather information for a given location."""
-    params = {
-        "q": f"{location},IN",
-        "appid": WEATHER_API_KEY,
-        "units": "metric"
-    }
+    """Fetch weather info by city name or coordinates (lat,lon)."""
     try:
+        if "," in location:  # assume lat,lon format
+            lat, lon = location.split(",")
+            params = {
+                "lat": lat.strip(),
+                "lon": lon.strip(),
+                "appid": WEATHER_API_KEY,
+                "units": "metric",
+            }
+        else:  # assume city name
+            params = {
+                "q": f"{location},IN",
+                "appid": WEATHER_API_KEY,
+                "units": "metric",
+            }
+
         response = requests.get(WEATHER_URL, params=params)
         response.raise_for_status()
         return response.json()
@@ -83,32 +93,40 @@ def fetch_gemini_suggestion(disease_name: str, weather_info: dict = None):
     if disease_name.lower() == "healthy":
         weather_text = ""
         if weather_info:
-            temp = weather_info.get('main', {}).get('temp')
-            humidity = weather_info.get('main', {}).get('humidity')
-            rain = weather_info.get('rain', {}).get('1h', 0)
-            weather_text = f" Current temperature: {temp}°C, Humidity: {humidity}%, Rainfall: {rain}mm."
-        prompt = f"The crop leaf is healthy.{weather_text} Give 3 simple precautionary steps farmers should take based on season and weather."
+            temp = weather_info.get("main", {}).get("temp")
+            humidity = weather_info.get("main", {}).get("humidity")
+            rain = weather_info.get("rain", {}).get("1h", 0)
+            weather_text = (
+                f" Current temperature: {temp}°C, Humidity: {humidity}%, Rainfall: {rain}mm."
+            )
+        prompt = (
+            f"The crop leaf is healthy.{weather_text} "
+            f"Give 3 simple precautionary steps farmers should take considering the season and weather."
+        )
     else:
-        prompt = f"The crop is affected by {disease_name}. Give 3 simple farmer-friendly treatment suggestions, including general care and medication names if possible."
+        prompt = (
+            f"The crop is affected by {disease_name}. "
+            f"Give 3 simple farmer-friendly treatment suggestions, including general care and medication names if possible."
+        )
 
     body = {
         "contents": [
             {
                 "role": "user",
-                "parts": [{"text": prompt}]
+                "parts": [{"text": prompt}],
             }
         ]
     }
 
     try:
         response = requests.post(
-            GEMINI_URL,
-            json=body,
-            headers={"Content-Type": "application/json"}
+            GEMINI_URL, json=body, headers={"Content-Type": "application/json"}
         )
         response.raise_for_status()
         data = response.json()
-        suggestion = data.get("candidates", [])[0]["content"]["parts"][0]["text"].strip()
+        suggestion = (
+            data.get("candidates", [])[0]["content"]["parts"][0]["text"].strip()
+        )
         return suggestion
     except Exception as e:
         return f"❌ Failed to fetch suggestions: {e}"
@@ -125,7 +143,7 @@ async def predict(file: UploadFile = File(...), location: str = Form(default=Non
     """
     Predict plant disease from uploaded image.
     - file: leaf image
-    - location: optional, used for weather-based suggestions if leaf is healthy
+    - location: optional (city name or 'lat,lon'), used for weather-based suggestions if leaf is healthy
     """
     try:
         # Validate image
@@ -151,15 +169,15 @@ async def predict(file: UploadFile = File(...), location: str = Form(default=Non
                 "status": "low_confidence",
                 "prediction": disease_name,
                 "confidence": confidence,
-                "suggestion": "AI is not confident about this prediction. Please retake the photo or consult an expert."
+                "suggestion": "AI is not confident about this prediction. Please retake the photo or consult an expert.",
             }
 
-        # Weather info for healthy leaves
+        # Weather info if leaf is healthy
         weather_info = None
         if disease_name.lower() == "healthy" and location:
             weather_info = get_weather(location)
 
-        # Get suggestions from Gemini
+        # Get Gemini suggestions
         suggestion = fetch_gemini_suggestion(disease_name, weather_info)
 
         return {
@@ -167,7 +185,7 @@ async def predict(file: UploadFile = File(...), location: str = Form(default=Non
             "prediction": disease_name,
             "confidence": confidence,
             "suggestion": suggestion,
-            "weather_info": weather_info if disease_name.lower() == "healthy" else None
+            "weather_info": weather_info if disease_name.lower() == "healthy" else None,
         }
 
     except Exception as e:
