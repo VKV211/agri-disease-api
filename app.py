@@ -80,7 +80,7 @@ async def predict(file: UploadFile = File(...)):
         disease_name = idx_to_class.get(predicted_index, "Unknown")
 
         # Low confidence handling
-        if confidence < 70:
+        if confidence < 80:
             return {
                 "status": "low_confidence",
                 "prediction": disease_name,
